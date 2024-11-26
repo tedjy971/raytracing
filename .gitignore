@@ -144,3 +144,5 @@
 /src/rayscene/CMakeFiles/rayscene.dir/progress.make
 /src/rayscene/CMakeFiles/CMakeDirectoryInformation.cmake
 /src/rayscene/CMakeFiles/progress.marks
+!/src/eigen-3.4.0/
+!/src/Eigen/

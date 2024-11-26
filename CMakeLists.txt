@@ -1,4 +1,3 @@
-find_package(OpenSSL REQUIRED)
 
 cmake_minimum_required(VERSION 3.5.0)
 project(raytracer VERSION 0.1.0 LANGUAGES C CXX)
@@ -45,6 +44,7 @@ target_link_libraries(test_runner
         lodepng
 )
 
+find_package(OpenSSL REQUIRED)
 target_link_libraries(test_runner PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 # Liez Eigen aux deux executables
