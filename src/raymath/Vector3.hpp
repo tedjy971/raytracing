@@ -1,12 +1,14 @@
 #pragma once
 
 #include <iostream>
-
+// #include <Eigen/Dense>
 #define COMPARE_ERROR_CONSTANT 0.000001
 
 class Vector3
 {
 private:
+  // Eigen::Vector3d vec;
+
 public:
   double x = 0;
   double y = 0;
@@ -21,6 +23,7 @@ public:
   const Vector3 operator*(double const &f) const;
   const Vector3 operator/(double const &f) const;
   Vector3 &operator=(Vector3 const &vec);
+
 
   double length() const;
   double lengthSquared() const;

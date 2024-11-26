@@ -5,8 +5,7 @@
 #include "Camera.hpp"
 #include "../rayimage/Image.hpp"
 
-class SceneLoader
-{
+class SceneLoader {
 public:
     static std::tuple<Scene *, Camera *, Image *> Load(std::string path);
 };

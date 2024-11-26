@@ -16,9 +16,9 @@ public:
   unsigned int width = 0;
   unsigned int height = 0;
 
-
   void setPixel(unsigned int x, unsigned int y, Color color);
   Color getPixel(unsigned int x, unsigned int y);
 
   void writeFile(std::string& filename);
+  bool readFile(const std::string& filename); // Nouvelle méthode
 };

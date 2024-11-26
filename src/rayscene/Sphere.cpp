@@ -30,7 +30,7 @@ void Sphere::countPrimes() {
       if(count == 0)
       {
         prime_counter++;
-      }  
+      }
     }
   }
 }
@@ -72,7 +72,7 @@ bool Sphere::intersects(Ray &r, Intersection &intersection, CullingType culling)
   intersection.Normal = (P1 - center).normalize();
 
   // Junk function!!
-  countPrimes();
+  // countPrimes();
 
   return true;
 }

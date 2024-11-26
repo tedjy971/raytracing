@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "Vector3.hpp"
+#include <Eigen/Dense>
 
 Vector3::Vector3() : x(0), y(0), z(0)
 {
