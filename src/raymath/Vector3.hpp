@@ -58,6 +58,5 @@ public:
     cachedNormalized = nullptr;
   }
 
-
   friend std::ostream &operator<<(std::ostream &_stream, Vector3 const &vec);
 };

@@ -1,8 +1,17 @@
+option(USE_MULTITHREADING "Enable multithreading" ON)
 
 cmake_minimum_required(VERSION 3.5.0)
 project(raytracer VERSION 0.1.0 LANGUAGES C CXX)
 
-find_package(Threads REQUIRED)
+if (USE_MULTITHREADING)
+    message(STATUS "Building with multithreading enabled")
+    add_definitions(-DUSE_MULTITHREADING)
+    find_package(Threads REQUIRED)
+else ()
+    message(STATUS "Building with multithreading disabled")
+
+endif ()
+
 find_program(VALGRIND "valgrind")
 
 set(CMAKE_CXX_STANDARD 17)
@@ -36,7 +45,7 @@ target_link_libraries(raytracer
         raymath
         rayimage
         lodepng
-        Threads::Threads
+        $<$<BOOL:${USE_MULTITHREADING}>:Threads::Threads>
 )
 
 # Linking pour test_runner
@@ -46,7 +55,7 @@ target_link_libraries(test_runner
         raymath
         rayimage
         lodepng
-        Threads::Threads
+        $<$<BOOL:${USE_MULTITHREADING}>:Threads::Threads>
 )
 
 find_package(OpenSSL REQUIRED)
@@ -106,14 +115,14 @@ set_tests_properties(failure_no_args
 #        PROPERTIES PASS_REGULAR_EXPRESSION "[0-9]+x[0-9]+ pixels")
 
 # Test sur l'image générée
-add_test(NAME image_comparison_test
+add_test(NAME image_comparison_test-twoSpheres
         COMMAND test_runner
         ${CMAKE_SOURCE_DIR}/scenes/two-spheres-on-plane.json
         ${CMAKE_SOURCE_DIR}/tests/reference/two-spheres-on-plane.png)
-add_test(NAME image_comparison_test2
+add_test(NAME image_comparison_test-isoSPhere 
         COMMAND test_runner
-        ${CMAKE_SOURCE_DIR}/scenes/two-triangles-on-plane.json
-        ${CMAKE_SOURCE_DIR}/tests/reference/two-triangles-on-plane.png)
+        ${CMAKE_SOURCE_DIR}/scenes/iso-sphere-on-plane.json
+        ${CMAKE_SOURCE_DIR}/tests/reference/iso-sphere-on-plane.png)
 
 if (VALGRIND)
     add_test(NAME memory_check
