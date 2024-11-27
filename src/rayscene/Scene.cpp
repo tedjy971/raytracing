@@ -34,6 +34,11 @@ void Scene::prepare()
   for (int i = 0; i < objects.size(); ++i)
   {
     objects[i]->applyTransform();
+
+    // Debug: afficher la boîte englobante après transformation
+    // std::cout << "Object " << i << " after transform: " << std::endl;
+    // std::cout << "AABB Min: " << objects[i]->getBoundingBox().Min << std::endl;
+    // std::cout << "AABB Max: " << objects[i]->getBoundingBox().Max << std::endl;
   }
 }
 
@@ -45,14 +50,29 @@ std::vector<Light *> Scene::getLights()
 bool Scene::closestIntersection(Ray &r, Intersection &closest, CullingType culling)
 {
   Intersection intersection;
-
   double closestDistance = -1;
   Intersection closestInter;
+
+  // Parcourir tous les objets de la scène
   for (int i = 0; i < objects.size(); ++i)
   {
+    // Vérifier d'abord l'intersection avec la boîte englobante
+    // std::cout << "Object " << i << ": " << std::endl;
+    // std::cout << "AABB Min: " << objects[i]->getBoundingBox().Min << std::endl;
+    // std::cout << "AABB Max: " << objects[i]->getBoundingBox().Max << std::endl;
+    // std::cout << "Ray Origin: " << r.GetPosition() << std::endl;
+    // std::cout << "Ray Direction: " << r.GetDirection() << std::endl;
+
+    bool aabbIntersect = objects[i]->intersectsBoundingBox(r);
+
+    if (!aabbIntersect)
+    {
+      continue; // Passer à l'objet suivant si pas d'intersection avec la AABB
+    }
+
+    // Si intersection avec AABB, tester l'intersection réelle
     if (objects[i]->intersects(r, intersection, culling))
     {
-
       intersection.Distance = (intersection.Position - r.GetPosition()).length();
       if (closestDistance < 0 || intersection.Distance < closestDistance)
       {

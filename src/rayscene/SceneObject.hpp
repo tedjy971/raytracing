@@ -1,8 +1,9 @@
 #pragma once
-#include "../raymath/Ray.hpp"
+  #include "../raymath/Ray.hpp"
 #include "Intersection.hpp"
 #include "Material.hpp"
 #include "../raymath/Transform.hpp"
+#include "../raymath/AABB.hpp"
 
 enum CullingType
 {
@@ -13,15 +14,25 @@ enum CullingType
 
 class SceneObject
 {
-private:
+protected:
+  AABB boundingBox;
+
 public:
   std::string name = "";
   Material *material = NULL;
   Transform transform;
 
   SceneObject();
-  ~SceneObject();
+
+  virtual ~SceneObject();
 
   virtual void applyTransform();
   virtual bool intersects(Ray &r, Intersection &intersection, CullingType culling);
+
+  virtual void computeBoundingBox() {};
+  const AABB &getBoundingBox() const { return boundingBox; }
+
+  virtual bool intersectsBoundingBox(Ray &r) const {
+    return boundingBox.intersects(r);
+  }
 };

@@ -20,4 +20,15 @@ public:
 
   virtual void applyTransform() override;
   virtual bool intersects(Ray &r, Intersection &intersection, CullingType culling) override;
+  void computeBoundingBox() override
+  {
+    if (triangles.empty())
+      return;
+
+    boundingBox = triangles[0]->getBoundingBox();
+    for (size_t i = 1; i < triangles.size(); ++i)
+    {
+      boundingBox.subsume(triangles[i]->getBoundingBox());
+    }
+  }
 };

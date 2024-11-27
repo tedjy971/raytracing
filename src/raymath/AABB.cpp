@@ -25,34 +25,28 @@ void AABB::subsume(AABB const &other)
     Max.z = std::max(Max.z, other.Max.z);
 }
 
-bool AABB::intersects(Ray &r)const 
+bool AABB::intersects(Ray &r) const
 {
-    /**
-     * Optimised implementation of ray-AABB intersection, taken from: https://tavianator.com/2011/ray_box.html
-     */
+    Vector3 dirfrac;
+    // Calculer l'inverse de la direction pour éviter les divisions
+    dirfrac.x = 1.0f / r.GetDirection().x;
+    dirfrac.y = 1.0f / r.GetDirection().y;
+    dirfrac.z = 1.0f / r.GetDirection().z;
 
-    Vector3 o = r.GetPosition();
-    Vector3 dInv = r.GetDirection().inverse();
+    // Calculer les intersections avec les faces de la boîte
+    float t1 = (Min.x - r.GetPosition().x) * dirfrac.x;
+    float t2 = (Max.x - r.GetPosition().x) * dirfrac.x;
+    float t3 = (Min.y - r.GetPosition().y) * dirfrac.y;
+    float t4 = (Max.y - r.GetPosition().y) * dirfrac.y;
+    float t5 = (Min.z - r.GetPosition().z) * dirfrac.z;
+    float t6 = (Max.z - r.GetPosition().z) * dirfrac.z;
 
-    double tx1 = (Min.x - o.x) * dInv.x;
-    double tx2 = (Max.x - o.x) * dInv.x;
+    float tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
+    float tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
 
-    double tmin = std::min(tx1, tx2);
-    double tmax = std::max(tx1, tx2);
-
-    double ty1 = (Min.y - o.y) * dInv.y;
-    double ty2 = (Max.y - o.y) * dInv.y;
-
-    tmin = std::max(tmin, std::min(ty1, ty2));
-    tmax = std::min(tmax, std::max(ty1, ty2));
-
-    double tz1 = (Min.z - o.z) * dInv.z;
-    double tz2 = (Max.z - o.z) * dInv.z;
-
-    tmin = std::max(tmin, std::min(tz1, tz2));
-    tmax = std::min(tmax, std::max(tz1, tz2));
-
-    return tmax >= tmin && tmax > 0;
+    // Si tmax < 0, le rayon intersecte la boîte mais derrière l'origine
+    // Si tmin > tmax, le rayon ne intersecte pas la boîte
+    return !(tmax < 0 || tmin > tmax);
 }
 
 std::ostream &operator<<(std::ostream &_stream, AABB const &box)

@@ -23,5 +23,19 @@ public:
   int ID;
 
   virtual void applyTransform() override;
+
+  void computeBoundingBox() override
+  {
+    Vector3 min(
+        std::min(std::min(tA.x, tB.x), tC.x),
+        std::min(std::min(tA.y, tB.y), tC.y),
+        std::min(std::min(tA.z, tB.z), tC.z));
+    Vector3 max(
+        std::max(std::max(tA.x, tB.x), tC.x),
+        std::max(std::max(tA.y, tB.y), tC.y),
+        std::max(std::max(tA.z, tB.z), tC.z));
+    boundingBox = AABB(min, max);
+  }
+
   virtual bool intersects(Ray &r, Intersection &intersection, CullingType culling) override;
 };

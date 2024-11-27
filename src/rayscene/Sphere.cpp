@@ -15,6 +15,7 @@ void Sphere::applyTransform()
 {
   Vector3 c;
   this->center = this->transform.apply(c);
+  computeBoundingBox(); // Recalculer après transformation
 }
 
 void Sphere::countPrimes() {

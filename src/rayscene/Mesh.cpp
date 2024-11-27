@@ -65,6 +65,7 @@ void Mesh::applyTransform()
         triangles[i]->transform = transform;
         triangles[i]->applyTransform();
     }
+    computeBoundingBox();
 }
 
 bool Mesh::intersects(Ray &r, Intersection &intersection, CullingType culling)

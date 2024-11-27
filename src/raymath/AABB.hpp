@@ -5,10 +5,10 @@
 class AABB
 {
 private:
-  Vector3 Min;
-  Vector3 Max;
 
 public:
+  Vector3 Min;
+  Vector3 Max;
   AABB();
   AABB(Vector3 min, Vector3 max);
   ~AABB();

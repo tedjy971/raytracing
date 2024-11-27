@@ -17,6 +17,8 @@ void Triangle::applyTransform()
   tA = this->transform.apply(A);
   tB = this->transform.apply(B);
   tC = this->transform.apply(C);
+
+  computeBoundingBox(); // Recalculate after transformation
 }
 
 bool Triangle::intersects(Ray &r, Intersection &intersection, CullingType culling)
