@@ -10,16 +10,13 @@ Vector3::Vector3(double iX, double iY, double iZ) : x(iX), y(iY), z(iZ)
 {
 }
 
-Vector3::~Vector3()
-{
-}
-
 const Vector3 Vector3::operator+(Vector3 const &vec) const
 {
   Vector3 c;
   c.x = x + vec.x;
   c.y = y + vec.y;
   c.z = z + vec.z;
+  c.invalidateCache();
   return c;
 }
 
@@ -29,6 +26,8 @@ const Vector3 Vector3::operator-(Vector3 const &vec) const
   c.x = x - vec.x;
   c.y = y - vec.y;
   c.z = z - vec.z;
+  c.invalidateCache();
+
   return c;
 }
 
@@ -38,6 +37,8 @@ const Vector3 Vector3::operator*(double const &f) const
   c.x = x * f;
   c.y = y * f;
   c.z = z * f;
+  c.invalidateCache();
+
   return c;
 }
 
@@ -47,14 +48,18 @@ const Vector3 Vector3::operator/(double const &f) const
   c.x = x / f;
   c.y = y / f;
   c.z = z / f;
+  c.invalidateCache();
+
   return c;
 }
 
-Vector3 &Vector3::operator=(Vector3 const &vec)
-{
-  x = vec.x;
-  y = vec.y;
-  z = vec.z;
+Vector3& Vector3::operator=(Vector3 const &vec) {
+  if (this != &vec) {  // Éviter l'auto-assignation
+    x = vec.x;
+    y = vec.y;
+    z = vec.z;
+    invalidateCache();
+  }
   return *this;
 }
 
@@ -63,20 +68,21 @@ double Vector3::length() const
   return std::sqrt(this->lengthSquared());
 }
 
-double Vector3::lengthSquared() const
-{
-  return (x * x + y * y + z * z);
-}
-
-const Vector3 Vector3::normalize() const
-{
-  double length = this->length();
-
-  if (length == 0)
-  {
-    return Vector3();
+Vector3 Vector3::normalize() const {
+  // Retourner la version cachée si elle existe
+  if (cachedNormalized != nullptr) {
+    return *cachedNormalized;
   }
-  return *this / length;
+
+  double lenSq = lengthSquared();
+  if (lenSq < COMPARE_ERROR_CONSTANT) {
+    cachedNormalized = new Vector3();
+  } else {
+    double invLength = 1.0 / std::sqrt(lenSq);
+    cachedNormalized = new Vector3(x * invLength, y * invLength, z * invLength);
+  }
+
+  return *cachedNormalized;
 }
 
 double Vector3::dot(Vector3 const &vec) const

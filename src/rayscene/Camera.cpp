@@ -1,6 +1,9 @@
 #include <iostream>
 #include <cmath>
 #include "Camera.hpp"
+
+#include <thread>
+
 #include "../raymath/Ray.hpp"
 
 struct RenderSegment
@@ -14,6 +17,7 @@ public:
   double intervalY;
   int reflections;
   Scene *scene;
+  Vector3 origin;
 };
 
 Camera::Camera() : position(Vector3())
@@ -62,27 +66,49 @@ void renderSegment(RenderSegment *segment)
   }
 }
 
-void Camera::render(Image &image, Scene &scene)
-{
-
-  double ratio = (double)image.width / (double)image.height;
-  double height = 1.0 / ratio;
-
-  double intervalX = 1.0 / (double)image.width;
-  double intervalY = height / (double)image.height;
+void Camera::render(Image &image, Scene &scene) {
+  const double ratio = static_cast<double>(image.width) / image.height;
+  const double height = 1.0 / ratio;
+  const double intervalX = 1.0 / image.width;
+  const double intervalY = height / image.height;
 
   scene.prepare();
 
-  RenderSegment *seg = new RenderSegment();
-  seg->height = height;
-  seg->image = &image;
-  seg->scene = &scene;
-  seg->intervalX = intervalX;
-  seg->intervalY = intervalY;
-  seg->reflections = Reflections;
-  seg->rowMin = 0;
-  seg->rowMax = image.height;
-  renderSegment(seg);
+  // Calculer le nombre optimal de threads
+  const unsigned int threadCount = std::thread::hardware_concurrency();
+  const int rowsPerThread = image.height / threadCount;
+
+  std::vector<RenderSegment> segments;
+  std::vector<std::thread> threads;
+
+  // Réserver l'espace pour éviter les réallocations
+  segments.reserve(threadCount);
+  threads.reserve(threadCount);
+
+  // Création des segments et threads
+  for (unsigned int i = 0; i < threadCount; ++i) {
+    RenderSegment seg;
+    // Calcul des lignes pour ce thread
+
+    seg.rowMin = i * rowsPerThread;
+    seg.rowMax = (i == threadCount-1) ? image.height
+                                         : (i + 1) * rowsPerThread;
+    seg.image = &image;
+    seg.height = height;
+    seg.intervalX = intervalX;
+    seg.intervalY = intervalY;
+    seg.reflections = Reflections;
+    seg.scene = &scene;
+    seg.origin = Vector3(0, 0, -1);
+
+    segments.push_back(seg);
+    threads.emplace_back(renderSegment, &segments.back());
+  }
+
+  // Attendre tous les threads
+  for (auto& thread : threads) {
+    thread.join();
+  }
 }
 
 std::ostream &operator<<(std::ostream &_stream, Camera &cam)

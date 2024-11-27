@@ -2,6 +2,9 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(raytracer VERSION 0.1.0 LANGUAGES C CXX)
 
+find_package(Threads REQUIRED)
+find_program(VALGRIND "valgrind")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -33,6 +36,7 @@ target_link_libraries(raytracer
         raymath
         rayimage
         lodepng
+        Threads::Threads
 )
 
 # Linking pour test_runner
@@ -42,14 +46,13 @@ target_link_libraries(test_runner
         raymath
         rayimage
         lodepng
+        Threads::Threads
 )
 
 find_package(OpenSSL REQUIRED)
 target_link_libraries(test_runner PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 # Liez Eigen aux deux executables
-#target_link_libraries(raytracer PUBLIC Eigen3::Eigen)
-#target_link_libraries(test_runner PUBLIC Eigen3::Eigen)
 
 enable_testing()
 
@@ -111,8 +114,6 @@ add_test(NAME image_comparison_test2
         COMMAND test_runner
         ${CMAKE_SOURCE_DIR}/scenes/two-triangles-on-plane.json
         ${CMAKE_SOURCE_DIR}/tests/reference/two-triangles-on-plane.png)
-
-find_program(VALGRIND "valgrind")
 
 if (VALGRIND)
     add_test(NAME memory_check
